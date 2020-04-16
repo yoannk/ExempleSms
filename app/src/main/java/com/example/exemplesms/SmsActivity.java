@@ -2,7 +2,9 @@ package com.example.exemplesms;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.view.View;
@@ -28,8 +30,15 @@ public class SmsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SmsManager smsManager = SmsManager.getDefault();
+
                 String smsMessage = txtMessage.getText().toString().trim();
                 String phoneNumber = txtPhoneNumber.getText().toString().trim().replaceAll("\\D", "");
+
+                Intent sendIntent = new Intent("SMS_SENT");
+                Intent deliveredIntent = new Intent("SMS_DELIVERED");
+
+                PendingIntent piSend = PendingIntent.getBroadcast(context, 0, sendIntent, 0);
+                PendingIntent piDelivered = PendingIntent.getBroadcast(context, 0, deliveredIntent, 0);
 
                 if (smsMessage.isEmpty()) {
                     Toast.makeText(context, "Veuillez saisir un message", Toast.LENGTH_SHORT).show();
@@ -41,7 +50,7 @@ public class SmsActivity extends AppCompatActivity {
                     return;
                 }
 
-                smsManager.sendTextMessage(phoneNumber, null, smsMessage, null, null);
+                smsManager.sendTextMessage(phoneNumber, null, smsMessage, piSend, piDelivered);
             }
         });
     }
